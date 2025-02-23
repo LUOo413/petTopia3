@@ -1,7 +1,9 @@
 package petTopia.controller.vendor_admin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ import petTopia.service.vendor_admin.VendorActivityService;
 public class VendorActivitivityController {
 	@Autowired
 	private VendorActivityService vendorActivityService;
-	
+
 	@Autowired
 	private VendorActivityRepository vendorActivityRepository;
 
@@ -69,19 +71,19 @@ public class VendorActivitivityController {
 
 	@GetMapping("/photos/download")
 	public ResponseEntity<?> downloadPhotoById(@RequestParam Integer photoId) {
-	    Optional<VendorActivityImages> imageOpt = vendorActivityImagesRepository.findById(photoId);
+		Optional<VendorActivityImages> imageOpt = vendorActivityImagesRepository.findById(photoId);
 
-	    if (imageOpt.isPresent()) {
-	        VendorActivityImages image = imageOpt.get();
-	        byte[] imageFile = image.getImage(); // 假設每個 VendorActivityPhoto 實體有一個 photoFile 字段，存儲圖片二進制數據
+		if (imageOpt.isPresent()) {
+			VendorActivityImages image = imageOpt.get();
+			byte[] imageFile = image.getImage(); // 假設每個 VendorActivityPhoto 實體有一個 photoFile 字段，存儲圖片二進制數據
 
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.setContentType(MediaType.IMAGE_JPEG);  // 假設圖片是 JPEG 格式
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.IMAGE_JPEG); // 假設圖片是 JPEG 格式
 
-	        return new ResponseEntity<>(imageFile, headers, HttpStatus.OK);  // 返回圖片的二進制數據
-	    }
+			return new ResponseEntity<>(imageFile, headers, HttpStatus.OK); // 返回圖片的二進制數據
+		}
 
-	    return new ResponseEntity<>(HttpStatus.NOT_FOUND);  // 如果找不到圖片，返回 404
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果找不到圖片，返回 404
 	}
 
 	@GetMapping("/photos/ids")
@@ -102,5 +104,32 @@ public class VendorActivitivityController {
 		}
 
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果沒有找到活動，返回 404
+	}
+
+	@GetMapping("/photos/idss")
+	public ResponseEntity<?> findPhotoIdsByVendorActivityIds(@RequestParam List<Integer> vendorActivityIds) {
+		List<Map<String, Object>> result = new ArrayList<>();
+
+		for (Integer vendorActivityId : vendorActivityIds) {
+			Optional<VendorActivity> op = vendorActivityRepository.findById(vendorActivityId);
+
+			if (op.isPresent()) {
+				VendorActivity vendorActivity = op.get();
+				List<VendorActivityImages> images = vendorActivity.getVendorActivityImages();
+
+				List<Integer> imageIdList = new ArrayList<>();
+				for (VendorActivityImages image : images) {
+					imageIdList.add(image.getId()); // 收集圖片 ID
+				}
+
+				Map<String, Object> data = new HashMap<>();
+				data.put("vendorActivityId", vendorActivityId);
+				data.put("imageIds", imageIdList);
+
+				result.add(data); // 添加活動的圖片 ID 信息
+			}
+		}
+
+		return new ResponseEntity<>(result, HttpStatus.OK); // 返回所有活動的圖片 ID 列表
 	}
 }
