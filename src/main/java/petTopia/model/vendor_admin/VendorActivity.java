@@ -39,7 +39,7 @@ public class VendorActivity {
 	private Integer id;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "vendor_id", nullable = false)
 	private Vendor vendor;
 
@@ -74,10 +74,12 @@ public class VendorActivity {
 	@Column(name = "address", nullable = false)
 	private String address;
 
-	@OneToMany(mappedBy = "vendorActivity",  cascade = CascadeType.ALL)
+	@JsonIgnore
+	@OneToMany(mappedBy = "vendorActivity", cascade = CascadeType.ALL)
 	@BatchSize(size = 20)
 	private List<VendorActivityImages> images;
 
+	@JsonIgnore
 	public List<VendorActivityImages> getVendorActivityImages() {
 		// TODO Auto-generated method stub
 		return images;

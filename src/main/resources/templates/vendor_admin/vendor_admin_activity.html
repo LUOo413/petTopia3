@@ -98,6 +98,7 @@ td.approved {
 							<th>活動時間</th>
 							<th>地點</th>
 							<th>活動類型</th>
+							<th>是否需要報名</th>
 							<th>瀏覽人數</th>
 							<th>操作</th>
 						</tr>
@@ -174,13 +175,13 @@ td.approved {
                 .then(response => {
                     let imageIds = response.data;
                     let firstImageUrl = imageIds.length > 0 ? `http://localhost:8080/photos/download?photoId=${imageIds[0]}` : '';
-
                     return [
                         `<img src="${firstImageUrl}" class="img-fluid rounded imgact" alt="活動圖片">`,
                         event.name,
                         `${formatDate(event.startTime)} - ${formatDate(event.endTime)}`,
                         event.address,
                         event.activityType.name,
+                        event.registrationRequired ? '需報名' : '不需報名',
                         event.numberVisitor,
                         `<button class="btn btn-danger btn-sm" onclick="deleteRow(event, this, ${event.id})">刪除</button>`
                     ];

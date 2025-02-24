@@ -293,9 +293,10 @@ function addImage() {
 			url: 'http://localhost:8080/api/vendor_activity/add',
 			data: formdata
 		})
-			.then(response =>
-				alert('新增成功')
-			)
+			.then(response =>{
+				alert('新增成功');
+				window.location.reload();
+			})
 			.catch(error =>
 				alert('新增失敗')
 
