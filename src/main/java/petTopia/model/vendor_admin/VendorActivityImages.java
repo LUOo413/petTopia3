@@ -30,7 +30,7 @@ public class VendorActivityImages {
     private Integer id;
     
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne	
     @JoinColumn(name = "vendor_activity_id", nullable = false)
     private VendorActivity vendorActivity;
     

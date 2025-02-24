@@ -1,17 +1,20 @@
 package petTopia.controller.vendor_admin;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,15 +22,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import petTopia.model.vendor_admin.ActivityType;
+import petTopia.model.vendor_admin.Vendor;
 import petTopia.model.vendor_admin.VendorActivity;
 import petTopia.model.vendor_admin.VendorActivityImages;
 import petTopia.repository.vendor_admin.VendorActivityImagesRepository;
 import petTopia.repository.vendor_admin.VendorActivityRepository;
+import petTopia.repository.vendor_admin.VendorRepository;
+import petTopia.service.vendor_admin.ActivityTypeService;
 import petTopia.service.vendor_admin.VendorActivityService;
 
 @Controller
 public class VendorActivitivityController {
+
+	@Autowired
+	private VendorRepository vendorRepository;
+
 	@Autowired
 	private VendorActivityService vendorActivityService;
 
@@ -37,10 +49,18 @@ public class VendorActivitivityController {
 	@Autowired
 	private VendorActivityImagesRepository vendorActivityImagesRepository;
 
+	@Autowired
+	private ActivityTypeService activityTypeService;
 //	@GetMapping
 //	public List<VendorActivity> getAllVendorActivities() {
 //		return vendorActivityService.getAllVendorActivities();
 //	}
+
+//	@GetMapping("/vendor_admin/activity/addPage")
+//	public String getVendorActivityAddPage() {
+//		return "/vendor_admin/vendor_admin_addactivity";
+//	}
+
 	@GetMapping("/vendor_admin/vendor_admin_activity")
 	public String getVendorActivityPage() {
 		return "vendor_admin/vendor_admin_activity"; // Thymeleaf 模板名稱
@@ -58,7 +78,7 @@ public class VendorActivitivityController {
 		return ResponseEntity.status(404).body(null);
 	}
 
-	@PostMapping
+	@PostMapping("/vendor_admin/vendor_admin_activity/add")
 	public VendorActivity createVendorActivity(@RequestBody VendorActivity vendorActivity) {
 		return vendorActivityService.saveVendorActivity(vendorActivity);
 	}
@@ -85,6 +105,20 @@ public class VendorActivitivityController {
 
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果找不到圖片，返回 404
 	}
+
+//	@GetMapping("/photos/first-id")
+//	public ResponseEntity<?> findFirstPhotoIdByVendorActivityId(@RequestParam Integer vendorActivityId) {
+//		// 调用 repository 方法，获取活动的第一张图片 ID
+//		Optional<Integer> firstImageId = vendorActivityService.getFirstImageIdByVendorActivityId(vendorActivityId);
+//
+//		if (firstImageId.isPresent()) {
+//			// 如果找到了图片 ID，返回该 ID
+//			return new ResponseEntity<>(firstImageId.get(), HttpStatus.OK);
+//		}
+//
+//		// 如果没有找到活动或者图片，返回 404 Not Found
+//		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//	}
 
 	@GetMapping("/photos/ids")
 	public ResponseEntity<?> findPhotoIdsByVendorActivityId(@RequestParam Integer vendorActivityId) {
@@ -131,5 +165,74 @@ public class VendorActivitivityController {
 		}
 
 		return new ResponseEntity<>(result, HttpStatus.OK); // 返回所有活動的圖片 ID 列表
+	}
+
+	@ResponseBody
+	@PostMapping("/add")
+	public ResponseEntity<String> addActivity(@RequestBody VendorActivity activity) {
+		vendorActivityService.addActivity(activity);
+		return ResponseEntity.ok("活動新增成功");
+	}
+
+	@GetMapping("/vendor_admin/activity/addPage")
+	public String showAddActivityPage(Model model) {
+		List<ActivityType> activityTypes = activityTypeService.getAllActivityTypes();
+		model.addAttribute("activityTypes", activityTypes);
+
+		// 轉換 is_registration_required 選單的值 (0 -> "不需報名", 1 -> "需要報名")
+		List<Map<String, Object>> registrationOptions = new ArrayList<>();
+		Map<String, Object> option1 = new HashMap<>();
+		option1.put("value", 1);
+		option1.put("label", "需要報名");
+		registrationOptions.add(option1);
+
+		Map<String, Object> option2 = new HashMap<>();
+		option2.put("value", 0);
+		option2.put("label", "不需報名");
+		registrationOptions.add(option2);
+
+		model.addAttribute("registrationOptions", registrationOptions);
+		return "/vendor_admin/vendor_admin_addactivity"; // Thymeleaf 頁面名稱
+	}
+
+	@ResponseBody
+	@PostMapping("/api/vendor_activity/add") // 不只可以送json 也可以送@RequestParam
+	public ResponseEntity<?> postHouse(@RequestParam("vendor_id") Integer vendorId, @RequestParam String activity_name,
+			@RequestParam ActivityType activity_type_id, @RequestParam String activity_description,
+			@RequestParam String activity_address,
+			@RequestParam("start_time") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date startTime,
+			@RequestParam("end_time") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date endTime,
+			@RequestParam String is_registration_required, @RequestParam("files") MultipartFile[] files) {
+
+		try {
+			VendorActivity vendorActivity = new VendorActivity();
+			Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new Exception("Vendor not found"));
+			vendorActivity.setVendor(vendor);
+			vendorActivity.setName(activity_name);
+			vendorActivity.setActivityType(activity_type_id);
+			vendorActivity.setDescription(activity_description);
+			vendorActivity.setAddress(activity_address);
+			vendorActivity.setStartTime(startTime);
+			vendorActivity.setEndTime(endTime);
+
+			List<VendorActivityImages> vendorActivityImagesList = new ArrayList<>();
+
+			for (MultipartFile oneFile : files) {
+				VendorActivityImages vendorActivityImages = new VendorActivityImages();
+				vendorActivityImages.setImage(oneFile.getBytes());
+				vendorActivityImages.setVendorActivity(vendorActivity); // 多set 一
+
+				vendorActivityImagesList.add(vendorActivityImages);
+			}
+
+			vendorActivity.setImages(vendorActivityImagesList); // 一set多
+
+			vendorActivityRepository.save(vendorActivity);
+			return new ResponseEntity<>(HttpStatus.CREATED); // 201
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // 400
+		}
+
 	}
 }

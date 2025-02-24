@@ -3,11 +3,14 @@ package petTopia.model.vendor_admin;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,7 +39,7 @@ public class VendorActivity {
 	private Integer id;
 
 	@JsonIgnore
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "vendor_id", nullable = false)
 	private Vendor vendor;
 
@@ -57,7 +60,7 @@ public class VendorActivity {
 	@Column(name = "is_registration_required", nullable = false)
 	private boolean isRegistrationRequired = false;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "activity_type_id", nullable = false)
 	private ActivityType activityType;
 
@@ -71,7 +74,8 @@ public class VendorActivity {
 	@Column(name = "address", nullable = false)
 	private String address;
 
-	@OneToMany(mappedBy = "vendorActivity", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "vendorActivity",  cascade = CascadeType.ALL)
+	@BatchSize(size = 20)
 	private List<VendorActivityImages> images;
 
 	public List<VendorActivityImages> getVendorActivityImages() {
