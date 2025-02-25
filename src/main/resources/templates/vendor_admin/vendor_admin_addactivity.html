@@ -163,17 +163,18 @@ function addImage() {
 				<!-- 				onsubmit="event.preventDefault(); submitForm();" -->
 				<form id="activity_form">
 					<div class="form-row">
+						<!-- 														要去抓登入者的id -->
 						<input type="hidden" name="vendor_id" value="1" />
 						<div class="form-group">
 							<label>活動名稱:</label> <input type="text" name="activity_name"
-								id="activity_name" value="">
+								id="activity_name" value="" required="required">
 						</div>
 						<div class="form-group">
 							<label>活動類型:</label>
 							<!-- 							 <input type="text" name="activity_type_id"> -->
 							<select name="activity_type_id" class="form-control"
-								id="activity_type_id">
-								<option value="">請選擇活動類型</option>
+								id="activity_type_id" required>
+								<option value="" disabled selected>請選擇活動類型</option>
 								<option th:each="type : ${activityTypes}" th:value="${type.id}"
 									th:text="${type.name}"></option>
 							</select>
@@ -182,11 +183,13 @@ function addImage() {
 					<div class="form-row">
 						<div class="form-group">
 							<label>活動描述:</label>
-							<textarea name="activity_description" id="activity_description"></textarea>
+							<textarea name="activity_description" id="activity_description"
+								required="required"></textarea>
 						</div>
 						<div class="form-group">
 							<label>活動地址:</label>
-							<textarea name="activity_address" id="activity_address"></textarea>
+							<textarea name="activity_address" id="activity_address"
+								required="required"></textarea>
 						</div>
 
 
@@ -194,11 +197,11 @@ function addImage() {
 					<div class="form-row">
 						<div class="form-group">
 							<label>開始時間:</label> <input type="datetime-local" id="start_time"
-								name="start_time">
+								name="start_time" required="required">
 						</div>
 						<div class="form-group">
 							<label>結束時間:</label> <input type="datetime-local" name="end_time"
-								id="end_time">
+								id="end_time" required="required">
 						</div>
 					</div>
 					<div class="form-row">
@@ -206,15 +209,20 @@ function addImage() {
 							<label>是否需要報名:</label>
 							<!-- 							<input type="text" name="is_registration_required"> -->
 							<select name="is_registration_required" class="form-control"
-								id="is_registration_required">
+								id="is_registration_required" required="required">
 								<option th:each="option : ${registrationOptions}"
 									th:value="${option.value}" th:text="${option.label}"></option>
 							</select>
 						</div>
+						<div class="form-group">
+							<label for="max_participants">活動最大報名人數:</label> <input
+								type="number" id="max_participants" name="max_participants"
+								class="form-control" required min="1">
+						</div>
 					</div>
 					<div class="form-group full-width">
 						<label>活動圖片:</label> <input type="file" id="house_photo"
-							name="files" multiple>
+							name="files" multiple required="required">
 
 
 					</div>
@@ -240,7 +248,25 @@ function addImage() {
 	</div>
 
 	<script type="text/javascript">
-	
+	document.addEventListener("DOMContentLoaded", function () {
+        let startTimeInput = document.getElementById("start_time");
+        let endTimeInput = document.getElementById("end_time");
+
+        // 設定開始時間不能選過去的日期
+        function setMinStartTime() {
+            let now = new Date();
+            let localDateTime = now.toISOString().slice(0, 16); // 轉換為 `YYYY-MM-DDTHH:MM`
+            startTimeInput.min = localDateTime;
+        }
+
+        // 當選擇開始時間時，設定結束時間不能早於開始時間
+        startTimeInput.addEventListener("change", function () {
+            endTimeInput.min = startTimeInput.value;
+        });
+
+        // 頁面載入時設定開始時間的最小值
+        setMinStartTime();
+    });
 // 	function submitForm() {
 // 		const sendBtn=document.querySelector(sendBtn);
 // 	    const form = document.querySelector('form');

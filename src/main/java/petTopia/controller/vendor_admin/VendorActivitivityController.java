@@ -24,10 +24,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import petTopia.model.vendor_admin.ActivityPeopleNumber;
 import petTopia.model.vendor_admin.ActivityType;
 import petTopia.model.vendor_admin.Vendor;
 import petTopia.model.vendor_admin.VendorActivity;
 import petTopia.model.vendor_admin.VendorActivityImages;
+import petTopia.repository.vendor_admin.ActivityPeopleNumberRepository;
 import petTopia.repository.vendor_admin.VendorActivityImagesRepository;
 import petTopia.repository.vendor_admin.VendorActivityRepository;
 import petTopia.repository.vendor_admin.VendorRepository;
@@ -51,6 +53,9 @@ public class VendorActivitivityController {
 
 	@Autowired
 	private ActivityTypeService activityTypeService;
+
+	@Autowired
+	private ActivityPeopleNumberRepository activityPeopleNumberRepository;
 //	@GetMapping
 //	public List<VendorActivity> getAllVendorActivities() {
 //		return vendorActivityService.getAllVendorActivities();
@@ -83,10 +88,13 @@ public class VendorActivitivityController {
 		return vendorActivityService.saveVendorActivity(vendorActivity);
 	}
 
+	@ResponseBody
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteVendorActivity(@PathVariable Integer id) {
+	public ResponseEntity<Map<String, String>> deleteVendorActivity(@PathVariable Integer id) {
 		vendorActivityService.deleteVendorActivity(id);
-		return ResponseEntity.noContent().build();
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "刪除成功");
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/photos/download")
@@ -167,12 +175,12 @@ public class VendorActivitivityController {
 		return new ResponseEntity<>(result, HttpStatus.OK); // 返回所有活動的圖片 ID 列表
 	}
 
-	@ResponseBody
-	@PostMapping("/add")
-	public ResponseEntity<String> addActivity(@RequestBody VendorActivity activity) {
-		vendorActivityService.addActivity(activity);
-		return ResponseEntity.ok("活動新增成功");
-	}
+//	@ResponseBody
+//	@PostMapping("/add")
+//	public ResponseEntity<String> addActivity(@RequestBody VendorActivity activity) {
+//		vendorActivityService.addActivity(activity);
+//		return ResponseEntity.ok("活動新增成功");
+//	}
 
 	@GetMapping("/vendor_admin/activity/addPage")
 	public String showAddActivityPage(Model model) {
@@ -197,12 +205,13 @@ public class VendorActivitivityController {
 
 	@ResponseBody
 	@PostMapping("/api/vendor_activity/add") // 不只可以送json 也可以送@RequestParam
-	public ResponseEntity<?> postHouse(@RequestParam("vendor_id") Integer vendorId, @RequestParam String activity_name,
-			@RequestParam ActivityType activity_type_id, @RequestParam String activity_description,
-			@RequestParam String activity_address,
+	public ResponseEntity<?> addActivity(@RequestParam("vendor_id") Integer vendorId,
+			@RequestParam String activity_name, @RequestParam ActivityType activity_type_id,
+			@RequestParam String activity_description, @RequestParam String activity_address,
 			@RequestParam("start_time") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date startTime,
 			@RequestParam("end_time") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date endTime,
-			@RequestParam String is_registration_required, @RequestParam("files") MultipartFile[] files) {
+			@RequestParam String is_registration_required, @RequestParam Integer max_participants,
+			@RequestParam("files") MultipartFile[] files) {
 
 		try {
 			VendorActivity vendorActivity = new VendorActivity();
@@ -227,7 +236,14 @@ public class VendorActivitivityController {
 
 			vendorActivity.setImages(vendorActivityImagesList); // 一set多
 
-			vendorActivityRepository.save(vendorActivity);
+			vendorActivity = vendorActivityRepository.save(vendorActivity);
+
+			// 5. 建立並儲存人數表 (ActivityPeopleNumber)
+			ActivityPeopleNumber activityPeopleNumber = new ActivityPeopleNumber();
+			activityPeopleNumber.setVendorActivity(vendorActivity);
+			activityPeopleNumber.setMaxParticipants(max_participants);
+			activityPeopleNumber.setCurrentParticipants(0); // 初始參與人數設為 0
+			activityPeopleNumberRepository.save(activityPeopleNumber);
 			return new ResponseEntity<>(HttpStatus.CREATED); // 201
 		} catch (Exception e) {
 			e.printStackTrace();

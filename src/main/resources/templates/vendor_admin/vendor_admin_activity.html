@@ -15,7 +15,7 @@
 	th:href="@{https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css}">
 <style type="text/css">
 .container {
-	max-width: 95%; /* 調整容器寬度 */
+	max-width: 100%; /* 調整容器寬度 */
 }
 
 .imgact {
@@ -50,12 +50,12 @@ th.dt-type-numeric {
 	text-align: left !important; /* 讓所有數字欄位也置中 */
 }
 
-td.pending {
-	color: red;
-}
+/* td.pending { */
+/* 	color: red; */
+/* } */
 
-td.approved {
-	color: green;
+/* td.approved { */
+/* 	color: green; */
 }
 </style>
 </head>
@@ -99,6 +99,7 @@ td.approved {
 							<th>地點</th>
 							<th>活動類型</th>
 							<th>是否需要報名</th>
+							<th>報名人數/最大人數</th>
 							<th>瀏覽人數</th>
 							<th>操作</th>
 						</tr>
@@ -182,6 +183,7 @@ td.approved {
                         event.address,
                         event.activityType.name,
                         event.registrationRequired ? '需報名' : '不需報名',
+                        event.activityPeopleNumber ? `${event.activityPeopleNumber.currentParticipants} / ${event.activityPeopleNumber.maxParticipants}` : "未設定",
                         event.numberVisitor,
                         `<button class="btn btn-danger btn-sm" onclick="deleteRow(event, this, ${event.id})">刪除</button>`
                     ];
@@ -208,7 +210,7 @@ td.approved {
     function deleteRow(event, button, activityId) {
         event.stopPropagation();
         if (confirm("確定要刪除這個活動嗎？")) {
-            axios.delete(`/api/vendor-activity/${activityId}`)
+            axios.delete(`/${activityId}`)
                 .then(() => {
                     let table = $('#eventTable').DataTable();
                     table.row($(button).closest("tr")).remove().draw();
