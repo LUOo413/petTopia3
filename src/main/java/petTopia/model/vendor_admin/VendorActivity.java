@@ -33,7 +33,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 public class VendorActivity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,7 +79,7 @@ public class VendorActivity {
 	@OneToMany(mappedBy = "vendorActivity", cascade = CascadeType.ALL)
 	@BatchSize(size = 20)
 	private List<VendorActivityImages> images;
-
+	
 	@JsonIgnore
 	public List<VendorActivityImages> getVendorActivityImages() {
 		// TODO Auto-generated method stub

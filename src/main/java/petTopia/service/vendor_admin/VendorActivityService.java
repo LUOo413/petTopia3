@@ -46,5 +46,8 @@ public class VendorActivityService {
 //				.map(VendorActivityImages::getId);
 //	}
 	
+	public Optional<VendorActivity> getVendorActivityById(Integer id) {
+		return vendorActivityRepository.findById(id);
+	}
 	
 }

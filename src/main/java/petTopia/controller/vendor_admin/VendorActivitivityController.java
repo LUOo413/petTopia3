@@ -1,6 +1,7 @@
 package petTopia.controller.vendor_admin;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,62 @@ public class VendorActivitivityController {
 		return "vendor_admin/vendor_admin_activity"; // Thymeleaf 模板名稱
 	}
 
+	@GetMapping("/vendor_admin/vendor_admin_activityDetail")
+	public String getVendorActivityDetail(@RequestParam Integer id, Model model) {
+		Optional<VendorActivity> activity = vendorActivityService.getVendorActivityById(id);
+		List<Integer> vendorActivityImageIdList = new ArrayList<>();
+		if (activity.isPresent()) {
+			VendorActivity vendorActivity = activity.get();
+			System.out.println(vendorActivity);
+			ActivityPeopleNumber activityPeopleNumber = vendorActivity.getActivityPeopleNumber();
+			List<ActivityType> activityTypes = activityTypeService.getAllActivityTypes();
+			List<Map<String, Object>> registrationOptions = new ArrayList<>();
+			Map<String, Object> option1 = new HashMap<>();
+			option1.put("value", 1);
+			option1.put("label", "需要報名");
+			registrationOptions.add(option1);
+
+			Map<String, Object> option2 = new HashMap<>();
+			option2.put("value", 0);
+			option2.put("label", "不需報名");
+			registrationOptions.add(option2);
+
+			List<VendorActivityImages> vendorActivityImageList = vendorActivity.getImages();
+			for (VendorActivityImages oneImage : vendorActivityImageList) {
+				Integer imageId = oneImage.getId();
+				vendorActivityImageIdList.add(imageId);	
+			}
+			model.addAttribute("vendorActivity", vendorActivity);
+			model.addAttribute("vendorActivityImageIdList", vendorActivityImageIdList);
+			model.addAttribute("activityPeopleNumber", activityPeopleNumber);
+			model.addAttribute("activityTypes", activityTypes);
+			model.addAttribute("registrationOptions", registrationOptions);
+			return "/vendor_admin/vendor_admin_activitydetail";
+		}
+		return "error";
+	}
+
+	@GetMapping("/vendor_admin/activity/addPage")
+	public String showAddActivityPage(Model model) {
+		List<ActivityType> activityTypes = activityTypeService.getAllActivityTypes();
+		model.addAttribute("activityTypes", activityTypes);
+
+		// 轉換 is_registration_required 選單的值 (0 -> "不需報名", 1 -> "需要報名")
+		List<Map<String, Object>> registrationOptions = new ArrayList<>();
+		Map<String, Object> option1 = new HashMap<>();
+		option1.put("value", 1);
+		option1.put("label", "需要報名");
+		registrationOptions.add(option1);
+
+		Map<String, Object> option2 = new HashMap<>();
+		option2.put("value", 0);
+		option2.put("label", "不需報名");
+		registrationOptions.add(option2);
+
+		model.addAttribute("registrationOptions", registrationOptions);
+		return "/vendor_admin/vendor_admin_addactivity"; // Thymeleaf 頁面名稱
+	}
+
 	@ResponseBody
 	@GetMapping("/api/vendor/activity/{vendorId}")
 	public ResponseEntity<List<VendorActivity>> getVendorActivitiesByVendorId(@PathVariable Integer vendorId) {
@@ -83,10 +140,10 @@ public class VendorActivitivityController {
 		return ResponseEntity.status(404).body(null);
 	}
 
-	@PostMapping("/vendor_admin/vendor_admin_activity/add")
-	public VendorActivity createVendorActivity(@RequestBody VendorActivity vendorActivity) {
-		return vendorActivityService.saveVendorActivity(vendorActivity);
-	}
+//	@PostMapping("/vendor_admin/vendor_admin_activity/add")
+//	public VendorActivity createVendorActivity(@RequestBody VendorActivity vendorActivity) {
+//		return vendorActivityService.saveVendorActivity(vendorActivity);
+//	}
 
 	@ResponseBody
 	@DeleteMapping("/{id}")
@@ -181,27 +238,6 @@ public class VendorActivitivityController {
 //		vendorActivityService.addActivity(activity);
 //		return ResponseEntity.ok("活動新增成功");
 //	}
-
-	@GetMapping("/vendor_admin/activity/addPage")
-	public String showAddActivityPage(Model model) {
-		List<ActivityType> activityTypes = activityTypeService.getAllActivityTypes();
-		model.addAttribute("activityTypes", activityTypes);
-
-		// 轉換 is_registration_required 選單的值 (0 -> "不需報名", 1 -> "需要報名")
-		List<Map<String, Object>> registrationOptions = new ArrayList<>();
-		Map<String, Object> option1 = new HashMap<>();
-		option1.put("value", 1);
-		option1.put("label", "需要報名");
-		registrationOptions.add(option1);
-
-		Map<String, Object> option2 = new HashMap<>();
-		option2.put("value", 0);
-		option2.put("label", "不需報名");
-		registrationOptions.add(option2);
-
-		model.addAttribute("registrationOptions", registrationOptions);
-		return "/vendor_admin/vendor_admin_addactivity"; // Thymeleaf 頁面名稱
-	}
 
 	@ResponseBody
 	@PostMapping("/api/vendor_activity/add") // 不只可以送json 也可以送@RequestParam

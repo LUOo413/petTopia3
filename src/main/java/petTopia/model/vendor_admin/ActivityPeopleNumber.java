@@ -22,7 +22,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 public class ActivityPeopleNumber {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

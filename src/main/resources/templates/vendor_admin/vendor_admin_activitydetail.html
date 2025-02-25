@@ -159,7 +159,7 @@ function addImage() {
 		<div th:replace="~{layout/vendor_admin_header}"></div>
 		<div class="content-body">
 			<div class="container">
-				<h2>新增活動</h2>
+				<h2>活動詳情</h2>
 				<!-- 				onsubmit="event.preventDefault(); submitForm();" -->
 				<form id="activity_form">
 					<div class="form-row">
@@ -167,7 +167,8 @@ function addImage() {
 						<input type="hidden" name="vendor_id" value="1" />
 						<div class="form-group">
 							<label>活動名稱:</label> <input type="text" name="activity_name"
-								id="activity_name" value="" required="required">
+								id="activity_name" value="" required="required"
+								th:value="${vendorActivity.name}">
 						</div>
 						<div class="form-group">
 							<label>活動類型:</label>
@@ -176,7 +177,8 @@ function addImage() {
 								id="activity_type_id" required>
 								<option value="" disabled selected>請選擇活動類型</option>
 								<option th:each="type : ${activityTypes}" th:value="${type.id}"
-									th:text="${type.name}"></option>
+									th:text="${type.name}"
+									th:selected="${type.id == vendorActivity.activityType.id}"></option>
 							</select>
 						</div>
 					</div>
@@ -184,12 +186,12 @@ function addImage() {
 						<div class="form-group">
 							<label>活動描述:</label>
 							<textarea name="activity_description" id="activity_description"
-								required="required"></textarea>
+								required="required" th:text="${vendorActivity.description}"></textarea>
 						</div>
 						<div class="form-group">
 							<label>活動地址:</label>
 							<textarea name="activity_address" id="activity_address"
-								required="required"></textarea>
+								required="required" th:text="${vendorActivity.address}"></textarea>
 						</div>
 
 
@@ -197,11 +199,13 @@ function addImage() {
 					<div class="form-row">
 						<div class="form-group">
 							<label>開始時間:</label> <input type="datetime-local" id="start_time"
-								name="start_time" required="required">
+								name="start_time" required="required"
+								th:value="${vendorActivity.startTime}">
 						</div>
 						<div class="form-group">
 							<label>結束時間:</label> <input type="datetime-local" name="end_time"
-								id="end_time" required="required">
+								id="end_time" required="required"
+								th:value="${vendorActivity.endTime}">
 						</div>
 					</div>
 					<div class="form-row">
@@ -211,19 +215,27 @@ function addImage() {
 							<select name="is_registration_required" class="form-control"
 								id="is_registration_required" required="required">
 								<option th:each="option : ${registrationOptions}"
-									th:value="${option.value}" th:text="${option.label}"></option>
+									th:value="${option.value}" th:text="${option.label}"
+									th:selected="${option.value == vendorActivity.isRegistrationRequired}"></option>
 							</select>
 						</div>
 						<div class="form-group">
 							<label for="max_participants">活動最大報名人數:</label> <input
 								type="number" id="max_participants" name="max_participants"
-								class="form-control" required min="1">
+								class="form-control" required min="1"
+								th:value="${activityPeopleNumber.maxParticipants}">
 						</div>
 					</div>
 					<div class="form-group full-width">
 						<label>活動圖片:</label> <input type="file" id="house_photo"
 							name="files" multiple required="required">
-
+						<div>
+							<th:block th:each="imageId : ${vendorActivityImageIdList}">
+								<img
+									th:src="@{'http://localhost:8080/photos/download?photoId=' + ${imageId}}"
+									alt="活動圖片" class="img-fluid rounded imgact" />
+							</th:block>
+						</div>
 
 					</div>
 					<div>
