@@ -280,6 +280,11 @@ public class VendorActivitivityController {
 			activityPeopleNumber.setMaxParticipants(max_participants);
 			activityPeopleNumber.setCurrentParticipants(0); // 初始參與人數設為 0
 			activityPeopleNumberRepository.save(activityPeopleNumber);
+			
+			//更新活動總數
+			vendor.setEventCount(vendor.getEventCount() + 1);
+	        vendorRepository.save(vendor);  // 儲存更新後的 Vendor
+			
 			return new ResponseEntity<>(HttpStatus.CREATED); // 201
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -287,4 +292,28 @@ public class VendorActivitivityController {
 		}
 
 	}
+	
+	// 計算並更新店家的等級
+//	private void updateVendorLevel(Vendor vendor) {
+//	    // 計算總活動數和評分來決定等級
+//	    String newLevel = calculateVendorLevel(vendor);
+//	    vendor.setVendorLevel(newLevel);  // 更新等級
+//	    vendorRepository.save(vendor);  // 儲存更新後的 Vendor
+//	}
+
+	// 計算等級的邏輯
+//	private String calculateVendorLevel(Vendor vendor) {
+//	    int totalPosts = vendor.getTotalActivityCount();  // 店家總發文數
+//	    double averageRating = vendor.getAverageRating(); // 假設 Vendor 有計算過的平均評分
+//
+//	    if (totalPosts >= 50 && averageRating >= 4.5) {
+//	        return "Gold";  // 等級為 Gold
+//	    } else if (totalPosts >= 30 && averageRating >= 4.0) {
+//	        return "Silver";  // 等級為 Silver
+//	    } else if (totalPosts >= 10 && averageRating >= 3.5) {
+//	        return "Bronze";  // 等級為 Bronze
+//	    } else {
+//	        return "Standard";  // 等級為 Standard
+//	    }
+//	}
 }
