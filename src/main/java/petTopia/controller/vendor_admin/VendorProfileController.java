@@ -80,7 +80,7 @@ public class VendorProfileController {
 			@RequestParam(required = false) String vendorPhone, @RequestParam(required = false) String vendorAddress,
 			@RequestParam(required = false) String vendorDescription,
 			@RequestParam(required = false) String contactPerson,
-			@RequestParam(required = false) String vendorTaxidNumber, @RequestParam(required = false) String category,
+			@RequestParam(required = false) String vendorTaxidNumber, @RequestParam(required = false) Integer category,
 			@RequestParam(required = false) MultipartFile vendorLogoImg, Model model) {
 		Map<String, Object> response = new HashMap<>();
 		// 查找原本的商家資料
@@ -123,7 +123,7 @@ public class VendorProfileController {
 
 		// 只有在傳遞 category 時才更新它
 		if (category != null) {
-			VendorCategory vendorCategory = categoryRepository.findByCategoryName(category)
+			VendorCategory vendorCategory = categoryRepository.findById(category)
 					.orElseThrow(() -> new RuntimeException("Category not found"));
 			vendor.setVendorCategory(vendorCategory);
 		}
