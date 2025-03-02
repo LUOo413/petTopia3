@@ -16,16 +16,16 @@ import jakarta.servlet.http.HttpSession;
 import petTopia.model.vendor_admin.User;
 import petTopia.model.vendor_admin.UserRole;
 import petTopia.model.vendor_admin.Vendor;
-import petTopia.service.vendor_admin.UserServiceImpl;
-import petTopia.service.vendor_admin.VendorServiceImpl;
+import petTopia.service.vendor_admin.UserService;
+import petTopia.service.vendor_admin.VendorService;
 
 @Controller
 public class LoginSystemController {
 	@Autowired
-	private UserServiceImpl userServiceImpl;
+	private UserService userService;
 
 	@Autowired
-	private VendorServiceImpl vendorServiceImpl;
+	private VendorService vendorService;
 
 	@GetMapping("/loginsystemmain.controller")
 	public String processMainAction() {
@@ -79,13 +79,13 @@ public class LoginSystemController {
 		}
 
 		// 確認帳號密碼是否正確
-		Optional<User> userOpt = userServiceImpl.getUserByEmailAndPassword(useremail, pwd);
+		Optional<User> userOpt = userService.getUserByEmailAndPassword(useremail, pwd);
 		if (userOpt.isPresent()) {
 			User user = userOpt.get();
 
 			// 如果是 Vendor，載入店家資訊
 			if (user.getUserRole() == UserRole.vendor) {
-				Optional<Vendor> vendorOpt = vendorServiceImpl.getVendorById(user.getUserId());
+				Optional<Vendor> vendorOpt = vendorService.getVendorById(user.getUserId());
 				if (vendorOpt.isPresent()) {
 					Vendor vendor = vendorOpt.get();
 

@@ -269,7 +269,8 @@ function addImage() {
 							<label>是否需要報名:</label>
 							<!-- 							<input type="text" name="is_registration_required"> -->
 							<select name="is_registration_required" class="form-control"
-								id="is_registration_required" required="required">
+								id="is_registration_required" onchange="toggleMaxParticipants()"
+								required="required">
 								<option th:each="option : ${registrationOptions}"
 									th:value="${option.value}" th:text="${option.label}"></option>
 							</select>
@@ -277,7 +278,7 @@ function addImage() {
 						<div class="form-group">
 							<label for="max_participants">活動最大報名人數:</label> <input
 								type="number" id="max_participants" name="max_participants"
-								class="form-control" required min="1">
+								class="form-control" required min="0">
 						</div>
 					</div>
 					<div class="form-group full-width">
@@ -287,15 +288,7 @@ function addImage() {
 						<!-- 預覽圖片區域 -->
 					</div>
 
-					<div>
-						<!-- 						<button type="button" class="btn btn-outline-dark" -->
-						<!-- 							onclick="toggleDeleteMode()">選擇刪除圖片</button> -->
-						<!-- 						<button type="button" class="btn btn-outline-dark" -->
-						<!-- 							onclick="deleteSelectedImages()">刪除選擇的圖片</button> -->
-						<!-- 											<button type="button" class="btn btn-outline-dark" -->
-						<!-- 												onclick="toggleDeleteMode()">選擇刪除圖片</button> -->
-						<!-- 											<button type="button" class="btn btn-outline-dark" -->
-						<!-- 												onclick="deleteSelectedImages()">刪除選擇的圖片</button> -->
+					<div style="text-align: right;">
 						<button type="submit" class="btn btn-outline-primary" id="sendBtn">新增活動</button>
 					</div>
 
@@ -313,6 +306,31 @@ function addImage() {
 	</div>
 
 	<script type="text/javascript">
+	
+	function toggleMaxParticipants() {
+        let select = document.getElementById("is_registration_required");
+        let maxParticipantsInput = document.getElementById("max_participants");
+
+        console.log("選擇的值:", select.value); // 確保選到的是 1 或 0
+
+        if (select.value === "false") { // 如果選擇「不需報名」
+            maxParticipantsInput.value = 0;
+            maxParticipantsInput.value = 0;
+            maxParticipantsInput.setAttribute("readonly", "readonly"); // 改用 readonly
+        } else { // 如果選擇「需要報名」
+            maxParticipantsInput.removeAttribute("readonly");
+            if (maxParticipantsInput.value == 0) {
+                maxParticipantsInput.value = 1; // 預設至少填 1
+            }
+        }
+    }
+
+    // 確保頁面載入時狀態正確
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("頁面載入完成，執行 toggleMaxParticipants()");
+        toggleMaxParticipants();
+    });
+	
 	
 	document.addEventListener("DOMContentLoaded", function () {
 	    const fileInput = document.getElementById("house_photo");
