@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,20 +17,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
-import petTopia.model.vendor_admin.ActivityPeopleNumber;
+import jakarta.transaction.Transactional;
 import petTopia.model.vendor_admin.ReviewPhoto;
-import petTopia.model.vendor_admin.Vendor;
-import petTopia.model.vendor_admin.VendorActivity;
-import petTopia.model.vendor_admin.VendorActivityImages;
 import petTopia.model.vendor_admin.VendorReviews;
+import petTopia.repository.vendor_admin.ReviewPhotoRepository;
 import petTopia.repository.vendor_admin.VendorReviewsRepository;
 import petTopia.service.vendor_admin.VendorReviewsService;
 
 @Controller
-
 public class VendorReviewsController {
 
 	@Autowired
@@ -36,6 +35,9 @@ public class VendorReviewsController {
 
 	@Autowired
 	private VendorReviewsRepository vendorReviewsRepository;
+
+	@Autowired
+	private ReviewPhotoRepository reviewPhotoRepository;
 
 	@GetMapping("/vendor_admin/reviews")
 	public String getReviewsPage() {
@@ -66,19 +68,67 @@ public class VendorReviewsController {
 		return vendorReviewsService.getPhotosByReviewId(reviewId);
 	}
 
-//	// 新增評論
-//	@ResponseBody
-//	@PostMapping("/api/vendor_admin/review/add")
-//	public ResponseEntity<?> addReview(@RequestBody VendorReviews review) {
-//		try {
-//			// 假设saveReview是保存评论的方法
-//			VendorReviews savedReview = vendorReviewsRepository.save(review);
-//			return new ResponseEntity<>(savedReview, HttpStatus.CREATED); // 返回保存的评论数据
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>("Failed to add review", HttpStatus.BAD_REQUEST); // 提供错误信息
-//		}
-//	}
+	@GetMapping("/review_photos/ids")
+	public ResponseEntity<?> findPhotoIdByVendorReviewId(@RequestParam Integer vendorReviewId) {
+		Optional<VendorReviews> op = vendorReviewsRepository.findById(vendorReviewId);
+
+		List<Integer> photoIdList = new ArrayList<>();
+
+		if (op.isPresent()) {
+			VendorReviews vendorReviews = op.get();
+			List<ReviewPhoto> photos = vendorReviews.getReviewPhotos();
+
+			for (ReviewPhoto photo : photos) {
+				photoIdList.add(photo.getId()); // 假設每個 VendorActivityPhoto 實體有一個 id 字段
+			}
+
+			return new ResponseEntity<>(photoIdList, HttpStatus.OK); // 返回所有照片的 ID 列表
+		}
+
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果沒有找到活動，返回 404
+	}
+
+	@GetMapping("/review_photos/download")
+	public ResponseEntity<?> downloadPhotoById(@RequestParam Integer photoId) {
+		Optional<ReviewPhoto> photoOpt = reviewPhotoRepository.findById(photoId);
+
+		if (photoOpt.isPresent()) {
+			ReviewPhoto image = photoOpt.get();
+			byte[] photoFile = image.getPhoto(); // 假設每個 VendorActivityPhoto 實體有一個 photoFile 字段，存儲圖片二進制數據
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.IMAGE_JPEG); // 假設圖片是 JPEG 格式
+
+			return new ResponseEntity<>(photoFile, headers, HttpStatus.OK); // 返回圖片的二進制數據
+		}
+
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果找不到圖片，返回 404
+	}
+
+	// 新增評論
+//	@Transactional
+	@ResponseBody
+	@PostMapping("/api/vendor_admin/review/add")
+	public ResponseEntity<?> addReview(@RequestBody VendorReviews review) {
+		try {
+			// 假设saveReview是保存评论的方法
+			VendorReviews vendorReviews = new VendorReviews();
+//			vendorReviews.setId(review.getId());
+			vendorReviews.setVendorId(review.getVendorId());
+			vendorReviews.setMemberId(review.getMemberId());
+			vendorReviews.setReviewContent(review.getReviewContent());
+			vendorReviews.setReviewTime(review.getReviewTime());
+			vendorReviews.setRatingEnvironment(review.getRatingEnvironment());
+			vendorReviews.setRatingPrice(review.getRatingPrice());
+			vendorReviews.setRatingService(review.getRatingService());
+
+			VendorReviews savedReview = vendorReviewsRepository.save(vendorReviews);
+			return new ResponseEntity<>(savedReview, HttpStatus.CREATED); // 返回保存的评论数据
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>("Failed to add review", HttpStatus.BAD_REQUEST); // 提供错误信息
+		}
+	}
 //
 //	// 新增評論照片
 //	@PostMapping("/api/vendor_admin/review/add/photo")
