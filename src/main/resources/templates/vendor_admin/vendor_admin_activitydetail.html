@@ -231,6 +231,31 @@ input, textarea, select {
 	</div>
 
 	<script type="text/javascript">
+	
+	function toggleMaxParticipants() {
+        let select = document.getElementById("is_registration_required");
+        let maxParticipantsInput = document.getElementById("max_participants");
+
+        console.log("選擇的值:", select.value); // 確保選到的是 1 或 0
+
+        if (select.value === "false") { // 如果選擇「不需報名」
+            maxParticipantsInput.value = 0;
+            maxParticipantsInput.value = 0;
+            maxParticipantsInput.setAttribute("readonly", "readonly"); // 改用 readonly
+        } else { // 如果選擇「需要報名」
+            maxParticipantsInput.removeAttribute("readonly");
+            if (maxParticipantsInput.value == 0) {
+                maxParticipantsInput.value = 1; // 預設至少填 1
+            }
+        }
+    }
+
+    // 確保頁面載入時狀態正確
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("頁面載入完成，執行 toggleMaxParticipants()");
+        toggleMaxParticipants();
+    });
+	
         document.addEventListener("DOMContentLoaded", function () {
             const fileInput = document.getElementById("house_photo");
             const previewContainer = document.getElementById("preview-container");

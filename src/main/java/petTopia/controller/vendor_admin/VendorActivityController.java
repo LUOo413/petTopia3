@@ -36,7 +36,7 @@ import petTopia.service.vendor_admin.ActivityTypeService;
 import petTopia.service.vendor_admin.VendorActivityService;
 
 @Controller
-public class VendorActivitivityController {
+public class VendorActivityController {
 
 	@Autowired
 	private VendorRepository vendorRepository;
@@ -252,7 +252,7 @@ public class VendorActivitivityController {
 	}
 
 	@ResponseBody
-	@GetMapping("/api/vendor/activity/{vendorId}")
+	@GetMapping("/api/vendor_admin/activity/{vendorId}")
 	public ResponseEntity<List<VendorActivity>> getVendorActivitiesByVendorId(@PathVariable Integer vendorId) {
 		List<VendorActivity> activities = vendorActivityService.getVendorActivityByVendorId(vendorId);
 
