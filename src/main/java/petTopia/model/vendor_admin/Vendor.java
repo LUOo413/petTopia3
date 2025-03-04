@@ -93,14 +93,17 @@ public class Vendor {
 	private String vendorLevel = "普通";
 
 	@OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VendorCertification> certifications;
-    
-    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VendorActivity> activities;
-    
+	private List<VendorCertification> certifications;
+
+	@OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<VendorActivity> activities;
+
 //    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<VendorReview> reviews;
 //    
 //    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Notification> notifications;
+
+	@OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<VendorImages> images;
 }

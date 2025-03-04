@@ -1,6 +1,7 @@
 package petTopia.controller.vendor_admin;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,8 +26,13 @@ import org.springframework.web.multipart.MultipartFile;
 import petTopia.model.vendor_admin.User;
 import petTopia.model.vendor_admin.UserRole;
 import petTopia.model.vendor_admin.Vendor;
+import petTopia.model.vendor_admin.VendorActivity;
+import petTopia.model.vendor_admin.VendorActivityImages;
 import petTopia.model.vendor_admin.VendorCategory;
+import petTopia.model.vendor_admin.VendorImages;
 import petTopia.repository.vendor_admin.VendorCategoryRepository;
+import petTopia.repository.vendor_admin.VendorImagesRepository;
+import petTopia.repository.vendor_admin.VendorRepository;
 import petTopia.service.vendor_admin.UserService;
 import petTopia.service.vendor_admin.VendorService;
 
@@ -35,11 +42,17 @@ public class VendorProfileController {
 	@Autowired
 	private VendorService vendorService;
 
+	@Autowired
+	private VendorRepository vendorRepository;
+
 //	@Autowired
 //	private UserService userService;
 
 	@Autowired
 	private VendorCategoryRepository categoryRepository;
+
+	@Autowired
+	private VendorImagesRepository vendorImagesRepository;
 
 	// 根據用戶的 email 和 password 獲取 Vendor Profile
 	@GetMapping("/vendor/profile")
@@ -181,4 +194,41 @@ public class VendorProfileController {
 //			return "vendor_admin/app-profile"; // 刪除失敗則回到原頁面
 //		}
 //	}
+
+	@GetMapping("/profile_photos/download")
+	public ResponseEntity<?> downloadPhotoById(@RequestParam Integer photoId) {
+		Optional<VendorImages> imageOpt = vendorImagesRepository.findById(photoId);
+
+		if (imageOpt.isPresent()) {
+			VendorImages image = imageOpt.get();
+			byte[] imageFile = image.getImage(); // 假設每個 VendorActivityPhoto 實體有一個 photoFile 字段，存儲圖片二進制數據
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.IMAGE_JPEG); // 假設圖片是 JPEG 格式
+
+			return new ResponseEntity<>(imageFile, headers, HttpStatus.OK); // 返回圖片的二進制數據
+		}
+
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果找不到圖片，返回 404
+	}
+
+	@GetMapping("/profile_photos/ids")
+	public ResponseEntity<?> findPhotoIdsByVendorId(@RequestParam Integer vendorId) {
+		Optional<Vendor> op = vendorRepository.findById(vendorId);
+
+		List<Integer> imageIdList = new ArrayList<>();
+
+		if (op.isPresent()) {
+			Vendor vendor = op.get();
+			List<VendorImages> images = vendor.getImages();
+
+			for (VendorImages image : images) {
+				imageIdList.add(image.getId()); // 假設每個 VendorActivityPhoto 實體有一個 id 字段
+			}
+
+			return new ResponseEntity<>(imageIdList, HttpStatus.OK); // 返回所有照片的 ID 列表
+		}
+
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果沒有找到活動，返回 404
+	}
 }

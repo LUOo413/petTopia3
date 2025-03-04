@@ -93,7 +93,7 @@
         function generateStars(rating) {
             let stars = "";
             for (let i = 0; i < 5; i++) {
-                stars += i < rating ? "⭐" : "☆";
+                stars += i < rating ? "⭐ " : " ";
             }
             return stars;
         }
@@ -133,7 +133,7 @@
                     <td>${review.name}</td>
                     <td>${review.date}</td>
                     <td>${review.content}</td>
-                    <td>${generateStars(Math.round(avgRating))} (${avgRating})</td>
+                    <td>⭐ (${avgRating})</td>
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="deleteReview(event, ${index})">刪除</button>
                     </td>
@@ -157,8 +157,8 @@
             detailRow.innerHTML = `
                 <td colspan="5">
                     <div class="review-detail">
-                        <strong>環境評分：</strong> ${generateStars(Math.round(review.environment))} (${review.environment})<br>
-                        <strong>價格評分：</strong> ${generateStars(Math.round(review.price))} (${review.price})<br>
+                        <strong>環境評分：</strong> ${generateStars(Math.round(review.environment))}(${review.environment})&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 
+                        <strong>價格評分：</strong> ${generateStars(Math.round(review.price))}(${review.price})&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                         <strong>服務評分：</strong> ${generateStars(Math.round(review.service))} (${review.service})
                     </div>
                 </td>
