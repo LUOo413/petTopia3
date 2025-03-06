@@ -38,7 +38,7 @@ public class VendorReviews {
 	private Integer memberId;
 
 	@Column(name = "review_time", nullable = false)
-	private LocalDateTime reviewTime;
+	private java.util.Date reviewTime;
 
 	@Column(name = "review_content")
 	private String reviewContent;

@@ -70,12 +70,12 @@ public class Vendor {
 	private VendorCategory vendorCategory;
 
 	@Column(name = "registration_date", updatable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date registrationDate = new Date();
+
+	private java.util.Date registrationDate = new Date();
 
 	@Column(name = "updated_date")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date updatedDate = new Date();
+
+	private java.util.Date updatedDate = new Date();
 
 	@Column(name = "event_count")
 	private int eventCount = 0;
