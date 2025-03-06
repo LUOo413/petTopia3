@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import petTopia.model.vendor_admin.ReviewPhoto;
 import petTopia.model.vendor_admin.VendorReviews;
@@ -107,7 +109,8 @@ public class VendorReviewsController {
 //	@Transactional
 	@ResponseBody
 	@PostMapping("/api/vendor_admin/review/add")
-	public ResponseEntity<?> addReview(@RequestBody VendorReviews review) {
+	public ResponseEntity<?> addReview(@RequestBody VendorReviews review,
+			@RequestPart(value = "photo", required = false) MultipartFile photo) {
 		try {
 			// 假设saveReview是保存评论的方法
 			VendorReviews vendorReviews = new VendorReviews();
@@ -121,6 +124,15 @@ public class VendorReviewsController {
 			vendorReviews.setRatingService(review.getRatingService());
 
 			VendorReviews savedReview = vendorReviewsRepository.save(vendorReviews);
+
+			// 如果有上传图片，保存图片
+			if (photo != null && !photo.isEmpty()) {
+				ReviewPhoto reviewPhoto = new ReviewPhoto();
+				reviewPhoto.setVendorReview(savedReview);
+				reviewPhoto.setPhoto(photo.getBytes()); // 转换为 byte[]
+				reviewPhotoRepository.save(reviewPhoto); // 保存图片
+			}
+
 			return new ResponseEntity<>(savedReview, HttpStatus.CREATED); // 返回保存的评论数据
 		} catch (Exception e) {
 			e.printStackTrace();

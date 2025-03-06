@@ -1,5 +1,8 @@
 package petTopia.model.vendor_admin;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,10 +28,12 @@ public class ReviewPhoto {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "vendor_review_id", nullable = false)
 	private VendorReviews vendorReview;
 
+	@JsonIgnore
 	@Column(name = "photo", nullable = false)
 	private byte[] photo;
 }

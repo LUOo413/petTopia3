@@ -3,6 +3,8 @@ package petTopia.model.vendor_admin;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,6 +52,7 @@ public class VendorReviews {
 	@Column(name = "rating_service")
 	private Integer ratingService;
 
+	@JsonManagedReference
 	@OneToMany(mappedBy = "vendorReview", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<ReviewPhoto> reviewPhotos;
 }
