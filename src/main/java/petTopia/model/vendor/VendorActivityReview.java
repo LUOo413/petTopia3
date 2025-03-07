@@ -32,7 +32,7 @@ public class VendorActivityReview {
 
 	@ManyToOne
 	@JoinColumn(name = "vendor_id", nullable = false)
-	@JsonIgnoreProperties({ "id" })
+	@JsonIgnoreProperties({ "name", "description", "address", "logoImg" })
 	private Vendor vendor;
 
 //    @ManyToOne
