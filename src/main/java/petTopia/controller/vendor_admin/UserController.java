@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpSession;
-import petTopia.model.vendor_admin.User;
-import petTopia.model.vendor_admin.UserRole;
-import petTopia.model.vendor_admin.VendorCategory;
-import petTopia.model.vendor_admin.Vendor;
+import petTopia.model.vendor.User;
+import petTopia.model.vendor.UserRole;
+import petTopia.model.vendor.Vendor;
+import petTopia.model.vendor.VendorCategory;
 import petTopia.repository.vendor_admin.VendorCategoryRepository;
 import petTopia.service.vendor_admin.UserService;
 import petTopia.service.vendor_admin.VendorService;
@@ -93,7 +93,7 @@ public class UserController {
 //            }
 //        }
 //		// 透過 `category` 找到對應的 `VendorCategory`
-//		VendorCategory vendorCategory = categoryRepository.findByCategoryName(category)
+//		VendorCategory vendorCategory = categoryRepository.findByName(category)
 //				.orElseThrow(() -> new RuntimeException("Category not found"));
 //		vendor.setCategory(vendorCategory);
 //

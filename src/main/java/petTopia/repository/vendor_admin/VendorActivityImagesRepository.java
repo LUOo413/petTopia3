@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import petTopia.model.vendor_admin.VendorActivityImages;
+import petTopia.model.vendor.VendorActivityImages;
 
 public interface VendorActivityImagesRepository extends JpaRepository<VendorActivityImages, Integer> {
 

@@ -15,10 +15,11 @@
 			總平均評分: <span id="overallRating" class="text-primary fw-bold">-</span>
 		</h4>
 
-		<!-- 評分圖表 -->
-		<div class="chart-container mb-4">
-			<canvas id="ratingChart" style="max-width: 800px; margin: auto;"></canvas>
-		</div>
+		<!-- 		<!-- 評分圖表 -->
+		-->
+		<!-- 		<div class="chart-container mb-4"> -->
+		<!-- 			<canvas id="ratingChart" style="max-width: 800px; margin: auto;"></canvas> -->
+		<!-- 		</div> -->
 
 		<!-- 搜尋欄 -->
 		<input type="text" id="searchQuery" class="form-control mb-3"
@@ -26,21 +27,21 @@
 
 		<!-- 評價表格 -->
 		<div class="table-responsive">
-			<table class="table table-bordered table-hover shadow-sm rounded">
-				<thead class="table-dark text-light">
+			<table id="eventTable"
+				class="table table-bordered table-hover text-center">
+				<thead class="table-primary">
 					<tr>
-						<th>評論者</th>
-						<th>評價時間</th>
-						<th>評價內容</th>
-						<th>平均評分</th>
-						<th>操作</th>
+						<th>活動名稱</th>
+						<th>活動時間</th>
+						<th>地點</th>
+						<th>活動類型</th>
+
 					</tr>
 				</thead>
-				<tbody id="reviewTableBody">
-					<tr>
-						<td colspan="5" class="text-center text-muted">載入中...</td>
-					</tr>
+				<tbody id="eventTableBody">
+
 				</tbody>
+			</table>
 			</table>
 		</div>
 	</div>
@@ -49,7 +50,7 @@
         let reviews = [];
 
         function fetchReviews() {
-            axios.get('/api/vendor_admin/reviews/1')
+            axios.get('http://localhost:8080/api/vendor_admin/activity/1')
                 .then(response => {
                     reviews = response.data;
                     updateReviewsTable();
@@ -69,9 +70,115 @@
                 .catch(error => console.error('刪除失敗:', error));
         }
 
-        function calculateAvg(review) {
-            return ((review.ratingEnvironment + review.ratingPrice + review.ratingService) / 3).toFixed(1);
+//         function calculateAvg(review) {
+//             return ((review.ratingEnvironment + review.ratingPrice + review.ratingService) / 3).toFixed(1);
+//         }
+
+function displayActivities() {
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = '';
+            activities.forEach(activity => {
+                const item = `<div class="list-group-item">
+                    <button class="btn btn-link" onclick="showReviews(${activity.id}, this)">${activity.name}</button>
+                    <div id="reviews-${activity.id}" class="review-cards" style="display:none;">
+                        <!-- 這裡會動態填充評論卡片 -->
+                    </div>
+                </div>`;
+                activityList.innerHTML += item;
+            });
         }
+
+        function showReviews(activityId, button) {
+            const reviewSection = document.getElementById(`reviews-${activityId}`);
+            reviewSection.innerHTML = '';  // 清空以前的評論卡片
+
+            // 切換顯示/隱藏評論區域
+            if (reviewSection.style.display === 'none') {
+                reviewSection.style.display = 'flex';
+                reviews[activityId].forEach(review => {
+                    const card = `<div class="review-card">
+                        <h6>${review.memberId} <small>${review.reviewTime}</small></h6>
+                        <p>${review.reviewContent}</p>
+                        <p>⭐ (${calculateAvg(review)})</p>
+                    </div>`;
+                    reviewSection.innerHTML += card;
+                });
+            } else {
+                reviewSection.style.display = 'none';
+            }
+        }
+// function toggleReviewDetails(event, row, review, index) {
+//     let existingDetailRow = document.querySelector(`.detail-row-${index}`);
+//     if (existingDetailRow) {
+//         existingDetailRow.remove();
+//         return;
+//     }
+
+//     document.querySelectorAll('.review-detail-row').forEach(row => row.remove()); //确保每次只展开一个详情，而不会有多个详情行同时存在
+
+//     const detailRow = document.createElement('tr');
+//     detailRow.classList.add(`review-detail-row`, `detail-row-${index}`);
+
+//     // 使用 axios 发送请求获取照片 ID
+// //     axios.get(`/review_photos/ids?vendorReviewId=${review.id}`)
+// //         .then(response => {
+// //             const photoIds = response.data;  // 假设后端返回的照片 ID 是一个数组
+// //             let photoHtml = '';
+// // 			console.log(photoIds);
+// //             // 根据获得的 photoIds 获取图片
+// //             photoIds.forEach(photoId => {
+// //                 photoHtml += `<img src="http://localhost:8080/review_photos/download?photoId=${photoId}" alt="Review Photo" style="max-width: 100px; max-height: 100px; margin: 5px;" loading="lazy">`;
+// //             });
+
+//             // 在此之后，动态生成 detailRow 内容
+//             detailRow.innerHTML = `
+//                 <td colspan="5">
+//                     <div class="review-detail">
+//                         <strong>環境評分：</strong> ${generateStars(Math.round(review.ratingEnvironment))}(${review.ratingEnvironment})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+//                         <strong>價格評分：</strong> ${generateStars(Math.round(review.ratingPrice))}(${review.ratingPrice})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+//                         <strong>服務評分：</strong> ${generateStars(Math.round(review.ratingService))} (${review.ratingService})
+//                     </div>
+//                     <div>
+                
+//                         <div class="review-detail">
+//                             ${photoHtml}  <!-- 确保这里正确拼接了每张图片的HTML -->
+//                         </div>
+//                     </div>
+//                 </td>
+//             `;
+
+//             row.insertAdjacentElement('afterend', detailRow);
+// //         })
+// //         .catch(error => {
+// //             console.error('获取评论照片失败:', error);
+// //         });
+// }
+
+
+function toggleReviewDetails(event, row, review, index) {
+    let existingDetailRow = document.querySelector(`.detail-row-${index}`);
+    if (existingDetailRow) {
+        existingDetailRow.remove();
+        return;
+    }
+
+    // 先移除所有其他的 review 詳細資料行，確保只有一個展開
+    document.querySelectorAll('.review-detail-row').forEach(row => row.remove());
+
+    const detailRow = document.createElement('tr');
+    detailRow.classList.add(`review-detail-row`, `detail-row-${index}`);
+
+    // 只保留「查看活動評論」按鈕，並讓 `showReviews` 來處理評論顯示
+    detailRow.innerHTML = `
+        <td colspan="5">
+            <div>
+                <button class="btn btn-link" onclick="showReviews(${review.activityId}, this)">查看活動評論</button>
+            </div>
+        </td>
+    `;
+
+    row.insertAdjacentElement('afterend', detailRow);
+}
 
         function formatDate(dateString) {
             const date = new Date(dateString);

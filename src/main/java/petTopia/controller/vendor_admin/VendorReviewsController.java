@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import petTopia.model.vendor_admin.ReviewPhoto;
-import petTopia.model.vendor_admin.VendorReviews;
+import petTopia.model.vendor.ReviewPhoto;
+import petTopia.model.vendor.VendorReviews;
 import petTopia.repository.vendor_admin.ReviewPhotoRepository;
 import petTopia.repository.vendor_admin.VendorReviewsRepository;
 import petTopia.service.vendor_admin.VendorReviewsService;

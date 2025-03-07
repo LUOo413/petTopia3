@@ -29,6 +29,10 @@
 	color: gold;
 	font-size: 1.2em;
 }
+
+h4 {
+	text-align: center;
+}
 </style>
 </head>
 
@@ -37,8 +41,8 @@
 		<div th:replace="~{layout/vendor_admin_header}"></div>
 		<div class="content-body">
 			<div class="container mt-4">
-<!-- 				<h2 class="mb-3">店家評價概覽</h2> -->
-				<h4 >
+				<!-- 				<h2 class="mb-3">店家評價概覽</h2> -->
+				<h4>
 					總平均評分: <span id="overallRating" class="text-primary fw-bold">-</span>
 				</h4>
 
@@ -180,7 +184,7 @@
                 return;
             }
 
-            document.querySelectorAll('.review-detail-row').forEach(row => row.remove());
+            document.querySelectorAll('.review-detail-row').forEach(row => row.remove()); //确保每次只展开一个详情，而不会有多个详情行同时存在
 
             const detailRow = document.createElement('tr');
             detailRow.classList.add(`review-detail-row`, `detail-row-${index}`);
@@ -206,7 +210,7 @@
                             </div>
                             <div>
                         
-                                <div class="review-photos">
+                                <div class="review-detail">
                                     ${photoHtml}  <!-- 确保这里正确拼接了每张图片的HTML -->
                                 </div>
                             </div>
@@ -247,13 +251,13 @@
 
             ratingsData.reviews.forEach((review, index) => {
                 let avgRating = ((review.ratingEnvironment + review.ratingPrice + review.ratingService) / 3).toFixed(1);
-                let reviewText = `${review.memberId} ${review.reviewTime} ${review.reviewContent} ${avgRating}`.toLowerCase(); // 加入「平均評分」
-
+                const formattedDate = formatReviewDate(review.reviewTime); // 格式化日期
+                let reviewText = `${review.memberId} ${formattedDate} ${review.reviewContent} ${avgRating}`.toLowerCase(); // 加入「平均評分」
                 if (reviewText.includes(keyword)) { // 如果搜尋關鍵字出現在任何欄位，就顯示該評價
                     const row = document.createElement('tr');
                     row.innerHTML = `
                     	<td>${review.memberId}</td>
-                        <td>${review.reviewTime}</td>
+                        <td>${formattedDate}</td>
                         <td>${review.reviewContent}</td>
                         <td>⭐ (${avgRating})</td>
                         <td>
