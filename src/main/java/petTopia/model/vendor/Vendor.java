@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -67,14 +68,13 @@ public class Vendor {
 
 	@ManyToOne
 	@JoinColumn(name = "vendor_category_id")
+	@JsonIgnoreProperties({ "id" })
 	private VendorCategory vendorCategory;
 
 	@Column(name = "registration_date", updatable = false)
-
 	private java.util.Date registrationDate = new Date();
 
 	@Column(name = "updated_date")
-
 	private java.util.Date updatedDate = new Date();
 
 	@Column(name = "event_count")
@@ -95,6 +95,7 @@ public class Vendor {
 	@OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<VendorCertification> certifications;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<VendorActivity> activities;
 
@@ -107,16 +108,16 @@ public class Vendor {
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "vendor", cascade = CascadeType.ALL)
 	private List<VendorActivityReview> reviews;
-	
+
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "vendor", cascade = CascadeType.ALL)
 	private List<VendorImages> vendorImages;
-	
+
 	@OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<VendorImages> images;
-	
+
 	/* 使用Transient防止被序列化，用於Service層賦值 */
 	@Transient
 	private String logoImgBase64;
-	
+
 }

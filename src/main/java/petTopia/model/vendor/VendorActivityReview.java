@@ -1,6 +1,7 @@
 package petTopia.model.vendor;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,9 +11,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "vendor_activity_review")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class VendorActivityReview {
 
 	@Id
@@ -21,6 +32,7 @@ public class VendorActivityReview {
 
 	@ManyToOne
 	@JoinColumn(name = "vendor_id", nullable = false)
+	@JsonIgnoreProperties({ "id" })
 	private Vendor vendor;
 
 //    @ManyToOne
@@ -33,6 +45,7 @@ public class VendorActivityReview {
 	@Column(name = "review_content", nullable = false, length = 255)
 	private String reviewContent;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "vendor_activity_id", nullable = false)
 	private VendorActivity vendorActivity;

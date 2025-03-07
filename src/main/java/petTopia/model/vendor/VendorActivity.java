@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,13 +20,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "vendor_activity")
@@ -39,9 +37,10 @@ public class VendorActivity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@JsonIgnore
+//	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "vendor_id", nullable = false)
+	@JsonIgnoreProperties({ "name", "description", "address", "user", "logoImg", "", "" })
 	private Vendor vendor;
 
 	@Column(name = "name", nullable = false)
@@ -63,10 +62,10 @@ public class VendorActivity {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "activity_type_id", nullable = false)
+	@JsonIgnoreProperties({ "id" })
 	private ActivityType activityType;
 
 	@Column(name = "registration_date", updatable = false)
-
 	private java.util.Date registrationDate = new Date();
 
 	@Column(name = "number_visitor", nullable = false)
@@ -75,12 +74,12 @@ public class VendorActivity {
 	@Column(name = "address", nullable = false)
 	private String address;
 
-	@JsonIgnore
 	@OneToMany(mappedBy = "vendorActivity", cascade = CascadeType.ALL)
 	@BatchSize(size = 20)
+	@JsonIgnoreProperties({ "image" })
 	private List<VendorActivityImages> images;
 
-	@JsonIgnore
+	@JsonIgnoreProperties({ "image" })
 	public List<VendorActivityImages> getVendorActivityImages() {
 		// TODO Auto-generated method stub
 		return images;
@@ -88,4 +87,5 @@ public class VendorActivity {
 
 	@OneToOne(mappedBy = "vendorActivity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private ActivityPeopleNumber activityPeopleNumber;
+
 }

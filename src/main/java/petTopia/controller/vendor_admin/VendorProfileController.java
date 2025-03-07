@@ -1,8 +1,8 @@
 package petTopia.controller.vendor_admin;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,17 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import petTopia.model.vendor.User;
-import petTopia.model.vendor.UserRole;
 import petTopia.model.vendor.Vendor;
-import petTopia.model.vendor.VendorActivity;
-import petTopia.model.vendor.VendorActivityImages;
 import petTopia.model.vendor.VendorCategory;
 import petTopia.model.vendor.VendorImages;
 import petTopia.repository.vendor_admin.VendorCategoryRepository;
 import petTopia.repository.vendor_admin.VendorImagesRepository;
 import petTopia.repository.vendor_admin.VendorRepository;
-import petTopia.service.vendor_admin.UserService;
 import petTopia.service.vendor_admin.VendorService;
 
 @Controller
@@ -138,6 +133,8 @@ public class VendorProfileController {
 		if (vendorTaxidNumber != null) {
 			vendor.setTaxidNumber(vendorTaxidNumber);
 		}
+
+		vendor.setUpdatedDate(new Date());
 
 		// 更新圖片（如果有）
 		if (vendorLogoImg != null && !vendorLogoImg.isEmpty()) {

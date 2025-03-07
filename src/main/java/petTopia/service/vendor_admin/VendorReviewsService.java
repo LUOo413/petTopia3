@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import petTopia.model.vendor.ReviewPhoto;
-import petTopia.model.vendor.VendorReviews;
+import petTopia.model.vendor.VendorReview;
 import petTopia.repository.vendor_admin.ReviewPhotoRepository;
 import petTopia.repository.vendor_admin.VendorReviewsRepository;
 
@@ -21,8 +21,8 @@ public class VendorReviewsService {
 	private ReviewPhotoRepository reviewPhotoRepository;
 
 	// 根據店家 ID 取得評論
-	public List<VendorReviews> getReviewsByVendorId(Integer vendorId) {
-		return vendorReviewRepository.findByVendorId(vendorId);
+	public List<VendorReview> getReviewsByVendorId(Integer vendorId) {
+		return vendorReviewRepository.findReviewsByVendorId(vendorId);
 	}
 
 	// 根據評論 ID 取得對應的照片
@@ -31,7 +31,7 @@ public class VendorReviewsService {
 	}
 
 	// 新增評論
-	public VendorReviews addReview(VendorReviews review) {
+	public VendorReview addReview(VendorReview review) {
 		return vendorReviewRepository.save(review);
 	}
 
@@ -42,7 +42,7 @@ public class VendorReviewsService {
 
 	// 刪除評論
 	public boolean deleteReview(Integer reviewId) {
-		Optional<VendorReviews> review = vendorReviewRepository.findById(reviewId);
+		Optional<VendorReview> review = vendorReviewRepository.findById(reviewId);
 		if (review.isPresent()) {
 			vendorReviewRepository.deleteById(reviewId);
 			return true;
